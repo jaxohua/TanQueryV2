@@ -38,6 +38,8 @@ public class MyTanQuery extends javax.swing.JFrame {
 		mt.getDatos();
 	}
 
+	
+	
 	public MyTanQuery() throws SQLException {
 		//setExtendedState(MAXIMIZED_BOTH);
 

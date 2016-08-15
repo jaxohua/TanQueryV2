@@ -9,21 +9,27 @@ import TUIO.TuioProcessing;
 
 @SuppressWarnings("serial")
 public class MyCalibrate extends PApplet {
-	Calibration calibration;
+	Calibration_back calibration;
 
 	ArrayList<TuioObject> tuioObjectList;
 	TuioProcessing tuioClient;
 	PFont font;
+	int i=0;
+
 
 	public void setup() {
-		calibration = new Calibration();
+		calibration = new Calibration_back();
 		size(displayWidth, displayHeight);
-		background(255);
+		background(0);
 		font=createFont("Arial",16,true);
 
 	}
 
 	public void draw() {
+	//	this.clear();
+		//this.text("Valor de i="+i, 100, 60);
+		//i++;
+		
 
 	}
 
