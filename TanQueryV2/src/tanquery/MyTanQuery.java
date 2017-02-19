@@ -43,7 +43,7 @@ public class MyTanQuery extends javax.swing.JFrame {
 	public MyTanQuery() throws SQLException {
 		//setExtendedState(MAXIMIZED_BOTH);
 
-		setTitle("TanQuery MSICU");
+		setTitle("TanQuery");
 		// Las Dimensiones de la Ventana
 		//setSize(1280, 700);
 		//setSize(800, 600);

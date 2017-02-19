@@ -23,27 +23,27 @@ import controlP5.*;
 public class TanQuery extends PApplet {
 	ControlP5 cp5;
 	Textarea myTextarea;
-	
+
 	//parametros para calibración
-	
+
 	//Calibration calibration;
 	float cursor_size = 15;
 	float object_size = 60;//100
 	float table_size = 760;
 	float scale_factor = 1;
-	
+
 	float a1, b1, c1, a3, b3, a2, b2, c2;
 	int calPoints = 0;
 	boolean calibrated = false;
 
 	PVector[] cal = new PVector[4];
 	PVector[] dots = new PVector[4];
-	
+
 	int lineLength = 20; //Se utiliza para dibujar los puntos de calibracion draw
-	
-	
-	
-	
+
+
+
+
 	int interfaz=1; //1=fondo negro  0=Fondo Blanco
 	TuioProcessing tuioClient;
 	PFont font;
@@ -52,7 +52,7 @@ public class TanQuery extends PApplet {
 	boolean verbose = true;
 	boolean callback = true; // updates only after callbacks
 	//DBConnect conex = new DBConnect("localhost", 3306, "escuela", "root", "ax");
-	DBConnect conex = new DBConnect("localhost", 3306, "escuela", "root", "ax");
+	DBConnect conex = new DBConnect("localhost", 3306, "escuela", "tanquery", "$tanquery$");
 	String dataBase = "escuela";
 	ArrayList<Intervalo> intervalos;
 	ArrayList<Token> tokens;
@@ -70,19 +70,19 @@ public class TanQuery extends PApplet {
 	public String AR="";
 	ArbolConsulta arbolConsul;
 	float contador;
-	
+
 	boolean actualizar=false;
-	
+
 
 
 	boolean DATABASE = true;
 	String DB;
 	float distY = 120;
-	
+
 	//Valores utilziados para la animación de ellipse
 	float amount = 50, num;
 
-	
+
 
 	public void setup() {
 		font=createFont("Arial",16,true);
@@ -100,7 +100,7 @@ public class TanQuery extends PApplet {
 		this.calPoints=0;
 		this.calibration();
 
-		                  
+
 		intervalos = new ArrayList<Intervalo>();
 		intervalos = Busquedas.generaIntervalo(11, 360, 20);// A partir de 11º
 															// hasta 360º, cada
@@ -112,13 +112,13 @@ public class TanQuery extends PApplet {
 		consulta = new ArrayList<Consulta>();
 		arbolConsul=new ArbolConsulta();
 		contador=0;
-	
+
 
 		Valores.fillDatabases(this, conex);
-		
+
 		operadores = Valores.fillOperadores();
 		comparation=Valores.fillComparation();
-		
+
 		//size(displayWidth, displayHeight);
 		size(1280,1024);
 		//font = loadFont("Amaranth-42.vlw");
@@ -130,32 +130,32 @@ public class TanQuery extends PApplet {
 
 		//Se asignan Tokens temporales
 		Pruebas.test(this);
-		
+
 		// The font must be located in the sketch's
 		// "data" directory to load successfully
 
 	}
 
 	public void draw() {
-		
-	
-		
+
+
+
 		this.consulta.clear();
 		this.myTextarea.hide();
-		
+
 		//Pruebas.addToConsulta(this); Copia los Tokens hacia la lista de Consulta
 
 		this.query="";
 		this.queryAR="";
 		this.querySQL="";
-		
-		
+
+
 		//this.arbolConsul=new ArbolConsulta();
 		Display.dibujaArea(this);
 		Display.dispLeyenda(this);
-		
+
 		if (!this.calibrated){
-		    //this.drawC();	
+		    //this.drawC();
 			strokeWeight (2);
 			stroke(255);
 			noFill();
@@ -192,8 +192,8 @@ public class TanQuery extends PApplet {
 			int id = objeto.getSymbolID();
 			int objetoX = objeto.getScreenX(width);
 			int objetoY = objeto.getScreenY(height);
-			
-			
+
+
 //			if(Busquedas.objectsInRange(this)>0){ //si hay objetos dentro del area de asignación de valor
 //				fill(0,153,0);
 //				textFont(font, 12);
@@ -212,13 +212,13 @@ public class TanQuery extends PApplet {
 				else{
 					this.myTextarea.hide();
 				}
-					
+
 			//	}
 			}
 			if(id>0){
 					Valores.showToken(this, objeto);
 			}
-			
+
 			//Si esta en la lista de Tokens y dentro del área de trabajo.
 			if (Busquedas.isInToken(tokens, id)
 					&& Busquedas.isInTrabajo(objetoX, objetoY)) {//manda la posicion X,Y del Objeto
@@ -226,7 +226,7 @@ public class TanQuery extends PApplet {
 			}
 			Nodo nodoEncontrado=new Nodo();//4x
 			Token token=new Token();
-		
+
 			if (this.arbolConsul.getRaiz()!=null) {
 				nodoEncontrado = this.arbolConsul.getNodo(objeto.getSymbolID());
 				token=Valores.getToken(objeto.getSymbolID(), this.tokens);
@@ -237,18 +237,18 @@ public class TanQuery extends PApplet {
 							nodoEncontrado.valor=token.getValorSql();
 					}
 				}
-				
+
 			}
 
 		}//Fin for recorrido de objetos
-		
+
 		//System.out.println("Tamaño de consulta sin ordenar:"+consulta.size());
 		Consulta.listaContenido(consulta);
-		
-		
+
+
 		if (consulta.size() > 0) {
 			Consulta.crearArbol(this);
-			
+
 			System.out.println("Contenido del arbol");
 			arbolConsul.recorrido(this);
 			System.out.println("---Consulta AR---");
@@ -263,23 +263,23 @@ public class TanQuery extends PApplet {
 			this.actualizar=true;
 			arbolConsul.conexiones(this);
 
-			
+
 		}
 		if(consulta.size()==0){
 			this.arbolConsul.setRaiz(null);
 		}
-		
+
 		Display.dispSentencia(this, queryAR, "ar");
 		Display.dispSentencia(this,querySQL, "sql");
 		//line(846,152,765,259);
 		//line(846,152,903,268);
-		
-		
-		
+
+
+
 
 	}
 
-	
+
 	public void addTuioObject(TuioObject tobj) {
 		redraw();
 		// fill(0);
@@ -392,14 +392,14 @@ public class TanQuery extends PApplet {
 		// redraw()
 	}
 
-	int tx(TuioObject tobj) { 
-		return  this.corrected_x(tobj); 
+	int tx(TuioObject tobj) {
+		return  this.corrected_x(tobj);
 	}
 
-	int ty(TuioObject tobj) { 
-		return  this.corrected_y(tobj); 
+	int ty(TuioObject tobj) {
+		return  this.corrected_y(tobj);
 	}
-	
+
 	public void calibration()
 	  {
 	    //dot is the original calibration image
@@ -409,7 +409,7 @@ public class TanQuery extends PApplet {
 	    dots[1] = new PVector( width -calibInset, calibInset ); //top right
 	    dots[2] = new PVector( calibInset, height -calibInset ); //bot left
 	    dots[3] = new PVector( width -calibInset, height -calibInset); //bot right
-	    
+
 	    // if we already have some data, then we used the saved configuration
 	    String lines[] = loadStrings("src/data/calibration.txt");
 	    if(lines != null && lines.length == 8)
@@ -458,31 +458,31 @@ public class TanQuery extends PApplet {
 			}
 		}
 	}
-	
+
 	void getCalibrationPoint(int x, int y)
 	  {
 	    if( calibrated == false )
 	    {
 	      cal[calPoints ++] = new PVector(x,y);
-	  
+
 	      if( calPoints == 4 )
 	      {
-	        if( calibrate() == 0 ) calibrated = true; 
+	        if( calibrate() == 0 ) calibrated = true;
 	        else calPoints = 0;
 	      }
 	    }
 	}
-	
-	
-	int corrected_x(TuioObject tobj) 
-	  { 
-	    if(tobj != null) 
-	      return  (int)((a1 * tobj.getScreenX(width) + b1 * tobj.getScreenY(height) + c1 ) / (a3 * tobj.getScreenX(width) + b3 * tobj.getScreenY(height) + 1 )); 
+
+
+	int corrected_x(TuioObject tobj)
+	  {
+	    if(tobj != null)
+	      return  (int)((a1 * tobj.getScreenX(width) + b1 * tobj.getScreenY(height) + c1 ) / (a3 * tobj.getScreenX(width) + b3 * tobj.getScreenY(height) + 1 ));
 	    else return -1;
 	  }
-	int corrected_y(TuioObject tobj) 
-	  { 
-	    if(tobj != null) 
+	int corrected_y(TuioObject tobj)
+	  {
+	    if(tobj != null)
 	      return  (int)((this.a2 * tobj.getScreenX(width) + this.b2 * tobj.getScreenY(height) + this.c2 ) / (this.a3 * tobj.getScreenX(width) + this.b3 * tobj.getScreenY(height) + 1 ));
 	    else return -1;
 	  }
@@ -490,11 +490,11 @@ public class TanQuery extends PApplet {
 	int calibrate()
 	  {
 		System.out.println( "running calibration" );
-	  
-	  
-	    float [][] matrix = { 
+
+
+	    float [][] matrix = {
 	      { -1, -1, -1, -1, 0, 0, 0, 0 },
-	    
+
 	     {   -cal[0].x, -cal[1].x, -cal[2].x, -cal[3].x, 0, 0, 0, 0 },
 	     { -cal[0].y, -cal[1].y, -cal[2].y, -cal[3].y, 0,0,0,0 },
 	     { 0,0,0,0,-1,-1,-1,-1 },
@@ -503,52 +503,52 @@ public class TanQuery extends PApplet {
 	     { cal[0].x * dots[0].x, cal[1].x * dots[1].x, cal[2].x * dots[2].x, cal[3].x * dots[3].x, cal[0].x * dots[0].y, cal[1].x * dots[1].y, cal[2].x * dots[2].y, cal[3].x * dots[3].y },
 	     { cal[0].y * dots[0].x, cal[1].y * dots[1].x, cal[2].y * dots[2].x, cal[3].y * dots[3].x, cal[0].y * dots[0].y, cal[1].y * dots[1].y, cal[2].y * dots[2].y, cal[3].y * dots[3].y },
 	      };
-	    
-	    
+
+
 	    float [] bb = { -dots[0].x, -dots[1].x, -dots[2].x, -dots[3].x, -dots[0].y, -dots[1].y, -dots[2].y, -dots[3].y };
-	    
+
 	    // gauß-elimination
-	    
+
 	    for( int j = 1; j < 4; j ++ )
 	    {
-	    
+
 	       for( int i = 1; i < 8; i ++ )
 	       {
 	          matrix[i][j] = - matrix[i][j] + matrix[i][0];
 	       }
 	       bb[j] = -bb[j] + bb[0];
 	       matrix[0][j] = 0;
-	    
+
 	    }
-	    
-	    
+
+
 	    for( int i = 2; i < 8; i ++ )
 	    {
 	      matrix[i][2] = -matrix[i][2] / matrix[1][2] * matrix[1][1] + matrix[i][1];
 	    }
 	    bb[2] = - bb[2] / matrix[1][2] * matrix[1][1] + bb[1];
 	    matrix[1][2] = 0;
-	    
-	    
+
+
 	    for( int i = 2; i < 8; i ++ )
 	    {
 	      matrix[i][3] = -matrix[i][3] / matrix[1][3] * matrix[1][1] + matrix[i][1];
 	    }
 	    bb[3] = - bb[3] / matrix[1][3] * matrix[1][1] + bb[1];
 	    matrix[1][3] = 0;
-	    
-	    
-	    
+
+
+
 	    for( int i = 3; i < 8; i ++ )
 	    {
 	      matrix[i][3] = -matrix[i][3] / matrix[2][3] * matrix[2][2] + matrix[i][2];
 	    }
 	    bb[3] = - bb[3] / matrix[2][3] * matrix[2][2] + bb[2];
 	    matrix[2][3] = 0;
-	    
+
 	    System.out.println( "var57, var56, var55");
 	    System.out.println( matrix[4][6] + " " + matrix[4][5] + " " + matrix[4][4] );
-	    
+
 	    for( int j = 5; j < 8; j ++ )
 	    {
 	      for( int i = 4; i < 8; i ++ )
@@ -558,39 +558,39 @@ public class TanQuery extends PApplet {
 	      bb[j] = -bb[j] + bb[4];
 	      matrix[3][j] = 0;
 	    }
-	    
-	    
+
+
 	    for( int i = 5; i < 8; i ++ )
 	    {
 	      matrix[i][6] = -matrix[i][6] / matrix[4][6] * matrix[4][5] + matrix[i][5];
 	    }
-	    
+
 	    bb[6] = - bb[6] / matrix[4][6] * matrix[4][5] + bb[5];
 	    matrix[4][6] = 0;
-	    
-	    
+
+
 	    for( int i = 5; i < 8; i ++ )
 	    {
 	      matrix[i][7] = -matrix[i][7] / matrix[4][7] * matrix[4][5] + matrix[i][5];
 	    }
 	    bb[7] = - bb[7] / matrix[4][7] * matrix[4][5] + bb[5];
 	    matrix[4][7] = 0;
-	    
-	    
+
+
 	    for( int i = 6; i < 8; i ++ )
 	    {
 	      matrix[i][7] = -matrix[i][7] / matrix[5][7] * matrix[5][6] + matrix[i][6];
 	    }
 	    bb[7] = - bb[7] / matrix[5][7] * matrix[5][6] + bb[6];
 	    matrix[5][7] = 0;
-	    
-	    
-	    
+
+
+
 	    matrix[7][7] = - matrix[7][7]/matrix[6][7]*matrix[6][3] + matrix[7][3];
 	    bb[7] = -bb[7]/matrix[6][7]*matrix[6][3] + bb[3];
 	    matrix[6][7] = 0;
-	    
-	    
+
+
 	    System.out.println( "data dump" );
 	    for( int i = 0; i < 8 ; i ++ )
 	    {
@@ -600,15 +600,15 @@ public class TanQuery extends PApplet {
 	       }
 	       System.out.println("");
 	    }
-	    
+
 	    System.out.println( "bb" );
 	     for( int j= 0; j < 8 ; j ++ )
 	     {
 	       print( bb[j] + "," );
 	     }
-	    
+
 	    System.out.println("");
-	    
+
 	    b3 =  bb[7] /matrix[7][7];
 	    b2 = (bb[6]-(matrix[7][6]*b3+matrix[6][6]*a3))/matrix[5][6];
 	    a2 = (bb[5]-(matrix[7][5]*b3+matrix[6][5]*a3+matrix[5][5]*b2))/matrix[4][5];
@@ -617,7 +617,7 @@ public class TanQuery extends PApplet {
 	    b1 = (bb[2]-(matrix[7][2]*b3+matrix[6][2]*a3+matrix[5][2]*b2+matrix[4][2]*a2+matrix[3][2]*c2))/matrix[2][2];
 	    a1 = (bb[1]-(matrix[7][1]*b3+matrix[6][1]*a3+matrix[5][1]*b2+matrix[4][1]*a2+matrix[3][1]*c2+matrix[2][1]*b1))/matrix[1][1];
 	    c1 = (bb[0]-(matrix[7][0]*b3+matrix[6][0]*a3+matrix[5][0]*b2+matrix[4][0]*a2+matrix[3][0]*c2+matrix[2][0]*b1+matrix[1][0]*a1))/matrix[0][0];
-	    
+
 	    if( Float.isNaN( b3 ) ) return 1;
 	    if( Float.isNaN( b2 ) ) return 1;
 	    if( Float.isNaN( a2 ) ) return 1;
@@ -626,19 +626,19 @@ public class TanQuery extends PApplet {
 	    if( Float.isNaN( b1 ) ) return 1;
 	    if( Float.isNaN( a1 ) ) return 1;
 	    if( Float.isNaN( c1 ) ) return 1;
-	    
+
 	    System.out.println( "calibrated OK" );
-	    
+
 	    String data = ""+b3+";"+b2+";"+a2+";"+c2+";"+a3+";"+b1+";"+a1+";"+c1;
 	    System.out.println("String Data="+data);
-	    
+
 	    saveStrings("src/data/calibration.txt", split(data, ';'));
-	    
+
 	    return 0;
 	  }
-	
-	
-	
+
+
+
 	public static void main(String _args[]) {
 
 		try {

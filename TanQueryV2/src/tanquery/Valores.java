@@ -58,7 +58,7 @@ public class Valores {
 		ArrayList<String> listaVal;
 		if (frame.DATABASE) {
 			frame.conex = new DBConnect("localhost", 3306, frame.dataBase,
-					"root", "ax");
+					"tanquery", "$tanquery$");
 			listaVal = getValores(frame.conex, "show tables from "
 					+ frame.dataBase, "Tables_in_" + frame.dataBase);
 			System.out.println("Obteniendo Tablas de " + frame.dataBase);
@@ -166,7 +166,7 @@ public class Valores {
 							"Selecciona el valor del attributo", 30, 270);
 					// frame.text("Selecciona una relacion:", 5, 50);
 					//relation[1]=nombre del atributo
-					//relation[0]=nombre de la relacion					
+					//relation[0]=nombre de la relacion
 					String query = "select " + relation[1] + " from "
 							+ relation[0];
 					System.out.println(query);
@@ -232,8 +232,8 @@ public class Valores {
 					System.out.println("Constante guardado");
 				}
 			}
-			
-			
+
+
 //				else {
 //				if (tipo.equals("attribute") || tipo.equals("constant")) {
 //					if (tRango == 2) {
@@ -285,7 +285,7 @@ public class Valores {
 			frame.DATABASE = true;
 			frame.dataBase = valor;
 			frame.conex = new DBConnect("localhost", 3306, frame.dataBase,
-					"root", "ax");
+					"tanquery", "$tanquery$");
 			fillRelations(frame);
 		}
 
@@ -339,7 +339,7 @@ public class Valores {
 	}
 
 	@SuppressWarnings({ "unused", "static-access" })
-	public static void showToken(TanQuery frame, TuioObject objeto) { 
+	public static void showToken(TanQuery frame, TuioObject objeto) {
 		// muestra los valores de los Tokens cuando estan fuera del area de asignación
 		int id = objeto.getSymbolID();
 		int objetoX = objeto.getScreenX(frame.width);
@@ -359,9 +359,9 @@ public class Valores {
 		if (valor != null) {
 			 System.out.println("Valor encontrado:" + valor + " para Objeto:"
 			  + objeto.getSymbolID());
-			 
+
 			frame.fill(255, 0, 0);
-			
+
 			Display.showValor(frame, valor, objetoX - 40, objetoY - 40, tipo);
 			frame.ellipseMode(frame.CORNER);
 			frame.fill(frame.random(255), 20, 50, 2);// these are the colors
@@ -441,25 +441,25 @@ public class Valores {
 
 	public static String getValorToken(ArrayList<Token> valores, int id) {
 		String valor="";
-		
+
 		if (valores.size() > 0) {
 
 			for (Token token : valores) {
 				if (token.getId() == id) {
 					valor=token.getValorDisp();
-						
+
 					 System.out.println("getValorToken: encontrado " +valor);
-					 
+
 					if(Valores.whatIs(id).equals("attribute")){
 						//String rel = getValorToken(frame.tokens, idAttribute);
 						String[] attribute = valor.split("\\.");
 						valor=attribute[1];
 						System.out.println("El valor del atributo es: "+ attribute[1]+" relación:"+attribute[0]);
 					}
-					
+
 						return valor; // 4x
 					// return token.getValorSql();
-					
+
 				}
 			}
 			System.out.println("no se encontro Valor en Lista de Tokens");
