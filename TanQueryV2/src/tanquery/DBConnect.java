@@ -8,7 +8,7 @@ public class DBConnect {
 	private Statement st;
 	private ResultSet rs;
 	
-	public DBConnect(String server,int pto, String dbname, String user,String pass){
+	public DBConnect(String server,String pto, String dbname, String user,String pass){
 		try {
 			String myDriver = "org.gjt.mm.mysql.Driver";
 			String servidor="jdbc:mysql://" + server + ":" + pto + "/" + dbname;

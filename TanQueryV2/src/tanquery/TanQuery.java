@@ -1,11 +1,23 @@
 package tanquery;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.lang.System;
 
 //import com.mysql.fabric.xmlrpc.base.Array;
 
 
+
+
+
+
+
+
+
+
+import org.jespxml.excepciones.TagHijoNotFoundException;
 
 import TUIO.TuioBlob;
 import TUIO.TuioCursor;
@@ -18,11 +30,14 @@ import processing.core.PImage;
 import processing.core.PVector;
 //import processing.data.Table;
 import controlP5.*;
+import data.Log;
 
 @SuppressWarnings("serial")
 public class TanQuery extends PApplet {
 	ControlP5 cp5;
 	Textarea myTextarea;
+	Configuration getDatos=new Configuration();
+	ArrayList<String> datosXml=new ArrayList<String>();
 
 	//parametros para calibración
 
@@ -51,9 +66,25 @@ public class TanQuery extends PApplet {
 	PImage fondo = null;
 	boolean verbose = true;
 	boolean callback = true; // updates only after callbacks
+	
+	//Carga de parametros de configuración
+	String dataBase;
+	String server;//Dirección del servidor BD
+	String port;//puerto donde se ejecuta el servicio MySQL 
+	String user;//usuario MySQL
+	String password;//contraseña para usuario MySQL
+	String logpath;	//directorio donde se guardaran los logs
+	
+	String nombreLog;
+	Date date;
+	DateFormat dateFormat;
+	DateFormat hourFormat;
+	//Log registro;
+	
 	//DBConnect conex = new DBConnect("localhost", 3306, "escuela", "root", "ax");
-	DBConnect conex = new DBConnect("localhost", 3306, "escuela", "tanquery", "$tanquery$");
-	String dataBase = "escuela";
+	DBConnect conex;
+	//DBConnect conex = new DBConnect("localhost", "3306", "escuela", "tanquery", "$tanquery$");
+	
 	ArrayList<Intervalo> intervalos;
 	ArrayList<Token> tokens;
 
@@ -85,6 +116,32 @@ public class TanQuery extends PApplet {
 
 
 	public void setup() {
+		try {
+			datosXml=getDatos.loadXML();
+		} catch (TagHijoNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+//Asignación de datos XML a variables de la clase TanQuery
+		dataBase = "escuela";
+		server=datosXml.get(0);
+		port=datosXml.get(1);
+		user=datosXml.get(2);
+		password=datosXml.get(3);
+		logpath=datosXml.get(4);
+		conex = new DBConnect(server, port, dataBase,user,password);
+		
+	//Se establece el nombre que llevará el Log ejemplo Log20022017181850.csv
+		date= new Date();
+		dateFormat = new SimpleDateFormat("ddMMyyyy");
+		hourFormat = new SimpleDateFormat("HHmmss");
+		//Nombre del log 
+		nombreLog="Log"+dateFormat.format(date)+hourFormat.format(date)+".csv";
+		System.out.println("Nombre del Log: "+nombreLog);
+		//Log.addLineCsv(nombreLog, "primera,linea,de,prueba");
+		
+		
 		font=createFont("Arial",16,true);
 
 		cp5 = new ControlP5(this);
@@ -129,7 +186,7 @@ public class TanQuery extends PApplet {
 		smooth();
 
 		//Se asignan Tokens temporales
-		Pruebas.test(this);
+		//Pruebas.test(this);
 
 		// The font must be located in the sketch's
 		// "data" directory to load successfully
@@ -171,6 +228,8 @@ public class TanQuery extends PApplet {
 		//text(" Loop " + this.contador, 100, 140);
 
 		tuioObjectList = tuioClient.getTuioObjectList();
+		
+		
 		if (dataBase != "")
 			// text("Base de Datos: "+dataBase,600,50);
 			fill(0, 153, 0);
@@ -181,6 +240,7 @@ public class TanQuery extends PApplet {
 			fill(255,255,255);
 			//text("Tokens Agregados:", 700, 70);
 			Valores.showTokens(this);
+			Valores.showListaTokens(tokens);
 		}
 		if(Busquedas.objectsInRange(this)>0){ //si hay objetos dentro del area de asignación de valor
 			fill(0,153,0);
@@ -192,6 +252,7 @@ public class TanQuery extends PApplet {
 			int id = objeto.getSymbolID();
 			int objetoX = objeto.getScreenX(width);
 			int objetoY = objeto.getScreenY(height);
+			//Log.addLineCsv(nombreLog, Integer.toString(id) +Valores.whatIs(objeto.getSymbolID())+ "," +Integer.toString(objetoX)+ ","+ Valores.getToken(objeto.getSymbolID(),this.tokens).getValorDisp());
 
 
 //			if(Busquedas.objectsInRange(this)>0){ //si hay objetos dentro del area de asignación de valor
@@ -202,12 +263,14 @@ public class TanQuery extends PApplet {
 			// Si el objeto esta en el área de asignación
 			if (Busquedas.isinRange(objetoX, objetoY)) {
 				String descrip="";
-				//if (Valores.whatIs(id) != "SAVE") {// si el elemento no corresponde a SAVE
 					Valores.setValor(this, objeto);
 					Valores.showToken(this, objeto);
 				if(Valores.whatIs(objeto.getSymbolID()).equals("operator")){
-					descrip=Valores.getDescOper(this.operadores,Valores.getToken(objeto.getSymbolID(),this.tokens).getValorDisp());
-					Display.dispAyuda(this, descrip);
+					if(Valores.onList(id, this.tokens)){
+						descrip=Valores.getDescOper(this.operadores,Valores.getToken(id,this.tokens).getValorDisp());
+						Display.dispAyuda(this, descrip);
+						//Log.addLineCsv(nombreLog, Integer.toString(id) +","+Valores.whatIs(objeto.getSymbolID())+ "," +Integer.toString(objetoX)+ ","+ Integer.toString(objetoY)+","+Valores.getToken(objeto.getSymbolID(),this.tokens).getValorDisp(),"asignación");
+					}
 				}
 				else{
 					this.myTextarea.hide();
@@ -243,7 +306,7 @@ public class TanQuery extends PApplet {
 		}//Fin for recorrido de objetos
 
 		//System.out.println("Tamaño de consulta sin ordenar:"+consulta.size());
-		Consulta.listaContenido(consulta);
+		//Consulta.listaContenido(consulta);
 
 
 		if (consulta.size() > 0) {
@@ -288,6 +351,7 @@ public class TanQuery extends PApplet {
 		//println("add obj " + tobj.getSymbolID() + " (" + tobj.getSessionID()
 			//	+ ") " + tobj.getX() + " " + tobj.getY() + " Angulo:"
 			//	+ tobj.getAngle() + " grados:" + tobj.getAngleDegrees());
+		Log.addLineCsv(logpath,nombreLog,tokens,"addObject",tobj,width,height);
 
 	}
 
@@ -304,6 +368,8 @@ public class TanQuery extends PApplet {
 				+ tobj.getMotionSpeed() + " VelRota:" + tobj.getRotationSpeed()
 				+ " AcelMot:" + tobj.getMotionAccel() + " AcelRot:"
 				+ tobj.getRotationAccel());*/
+				Log.addLineCsv(logpath,nombreLog,tokens,"updateObject",tobj,width,height);
+		//Log.addLineCsv(nombreLog, Integer.toString(id) +","+Valores.whatIs(objeto.getSymbolID())+ "," +Integer.toString(objetoX)+ ","+ Integer.toString(objetoY)+","+Valores.getToken(objeto.getSymbolID(),this.tokens).getValorDisp(),"asignación");
 
 	}
 
@@ -312,8 +378,10 @@ public class TanQuery extends PApplet {
 		// background(0);
 		redraw();
 		//if (verbose)
-			println("del obj " + tobj.getSymbolID() + " ("
-					+ tobj.getSessionID() + ")");
+		//	println("del obj " + tobj.getSymbolID() + " ("
+			//		+ tobj.getSessionID() + ")");
+		
+		Log.addLineCsv(logpath,nombreLog,tokens,"outVisionRange",tobj,width,height);
 
 	}
 
@@ -438,6 +506,7 @@ public class TanQuery extends PApplet {
 	      dots[calPoints].x, dots[calPoints].y + lineLength );
 	}
 //Método que recono
+	@SuppressWarnings("deprecation")
 	public void keyPressed() {
 		//java.util.ArrayList tuioObjectList = tuioClient.getTuioObjectList();
 
@@ -456,6 +525,13 @@ public class TanQuery extends PApplet {
 				this.getCalibrationPoint(tobj.getScreenX(width),
 						tobj.getScreenY(height));
 			}
+		}
+		if(key=='s'){
+				Configuration wConfig=new Configuration();
+				wConfig.show();
+				wConfig.setVisible(true);
+				System.out.println("Mostrando ventana de configuración");
+			
 		}
 	}
 

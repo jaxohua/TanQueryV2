@@ -226,9 +226,8 @@ public class Display {
 
 			}
 		    frame.ellipseMode(frame.CORNER);
-		    if(!tipo.equals("relation"))
-		    	//frame.ellipse(x, y, 5, 5);
-		    	frame.rect(x, y, 8, 8);
+		    if(!tipo.equals("relation")){}
+		    	//frame.rect(x, y, 8, 8);
 		    //frame.ellipse(x+x2,y+ y2, 15, 15);
 		  }
 		  frame.num += 0.5;
@@ -272,7 +271,7 @@ public class Display {
 	}
 	
 	public static void dispSentencia(TanQuery frame, String sentencia,String tipo){
-		frame.textFont(frame.font, 18);
+		frame.textFont(frame.font, 12);
 		int x=20,y=600;
 		String cadena="";
 		switch (tipo){

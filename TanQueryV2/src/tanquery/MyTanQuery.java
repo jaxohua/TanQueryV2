@@ -16,10 +16,9 @@ import javax.swing.JLabel;
 
 import java.awt.Color;
 import java.awt.Font;
-//import javax.swing.JButton;
 
 @SuppressWarnings("serial")
-public class MyTanQuery extends javax.swing.JFrame {
+public class MyTanQuery extends javax.swing.JFrame{
 	TanQuery sketch;
 	JTable table;
 	JPanel panel;
@@ -34,6 +33,7 @@ public class MyTanQuery extends javax.swing.JFrame {
 //linea
 
 	public static void main(String[] args) throws SQLException {
+		
 		MyTanQuery mt=new MyTanQuery();
 		mt.getDatos();
 	}
@@ -135,12 +135,17 @@ public class MyTanQuery extends javax.swing.JFrame {
 						System.out.println("Entrando en el Hilo..."
 								+ sketch.querySQL);
 					} else {
+						if(sketch.querySQL==""){
+							table.setModel(new DefaultTableModel());
+						}
 						reset++;
 						lblNewLabel.setText("Reseteando "+reset);
 					}
 
 					try {
-						Thread.sleep(505);
+						Thread.sleep(1005);
+						//Thread.sleep(505);
+
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -157,8 +162,12 @@ public class MyTanQuery extends javax.swing.JFrame {
 			sketch.conex.setSt(sketch.conex.con.createStatement());
 			sketch.conex.setRs(sketch.conex.getSt().executeQuery(sketch.querySQL));
 			rs = sketch.conex.getRs();
+			
 			model = buildTableModel(rs);
 			table.setModel(model);
+			if(sketch.querySQL==""){
+				table.setModel(new DefaultTableModel());
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -7,7 +7,6 @@
 	<classpathentry kind="lib" path="libreriasAX/TUIO/libTUIO.jar"/>
 	<classpathentry kind="lib" path="libreriasAX/core.jar"/>
 	<classpathentry kind="lib" path="libreriasAX/TUIO/TUIO.jar"/>
-	<classpathentry kind="lib" path="libreriasAX/jespxml_v1.1.rar"/>
 	<classpathentry kind="lib" path="libreriasAX/jespxml_v1.1/jespxml.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

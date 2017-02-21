@@ -51,14 +51,16 @@ public class Valores {
 		if (frame.dataBases.size() > 0)
 			return true;
 		return false;
+		
 	}
 
 	public static boolean fillRelations(TanQuery frame) {
 		// Cuando se tiene la base de datos, se rellena la lista con sus tablas
 		ArrayList<String> listaVal;
 		if (frame.DATABASE) {
-			frame.conex = new DBConnect("localhost", 3306, frame.dataBase,
-					"tanquery", "$tanquery$");
+			//frame.conex = new DBConnect("localhost", 3306, frame.dataBase,
+				//	"tanquery", "$tanquery$");
+			
 			listaVal = getValores(frame.conex, "show tables from "
 					+ frame.dataBase, "Tables_in_" + frame.dataBase);
 			System.out.println("Obteniendo Tablas de " + frame.dataBase);
@@ -248,7 +250,7 @@ public class Valores {
 			System.out.println("Valor nulo");
 			frame.fill(255, 0, 0);
 			frame.textFont(frame.font, 14);
-			frame.text("No existen valores disponibles", 220, 30);
+			frame.text("Este Objeto no tiene valor asignado.", 220, 30);
 		}
 	}
 
@@ -284,8 +286,8 @@ public class Valores {
 		if (tipo == "DB") {
 			frame.DATABASE = true;
 			frame.dataBase = valor;
-			frame.conex = new DBConnect("localhost", 3306, frame.dataBase,
-					"tanquery", "$tanquery$");
+			//frame.conex = new DBConnect("localhost", 3306, frame.dataBase,
+				//	"tanquery", "$tanquery$");
 			fillRelations(frame);
 		}
 
@@ -350,8 +352,10 @@ public class Valores {
 		String descrip = "";
 
 		try {
-			valor = Valores.getValorToken(lista, id);
-			tipo = Valores.getToken(id, lista).getTipo();
+			if(onList(id,lista)){
+				valor = Valores.getValorToken(lista, id);
+				tipo = Valores.getToken(id, lista).getTipo();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -526,15 +530,14 @@ public class Valores {
 						+ " El predicado no tiene por que definirse sobre atributos comunes"
 						+ "\n\n La notación de ThetaJoin es el mismo símbolo que se utiliza para NaturalJoin, la diferencia radica en que ThetaJoin lleva "
 						+ "el predicado C: \n R \u2A1DC S",
-						"\u2A1DC", "binario"));
+						"\u2A1D", "binario"));
 		operadores
 				.add(new Operadores(
 						"UNION",
 						"Unión: La unión de dos relaciones R y S, es otra relación que contiene las tuplas que están en R, o en S, o en ambas, eliminándose las "
 						+ "tuplas duplicadas. R y S deben ser unión-compatible, es decir, definidas sobre el mismo conjunto de atributo "
 						+ "(R y S deben tener esquemas idénticos. Deben poseer las mismas columnas y su orden debe ser el mismo)."
-						+ "\n\nNotación en álgebra relacional\n R∪S",
-						"\u222A", "binario"));
+						+ "\n\nNotación en álgebra relacional \n R∪S","\u222A", "binario"));
 		operadores
 				.add(new Operadores(
 						"DIFERENCIA",
@@ -681,6 +684,18 @@ public class Valores {
 
 	}
 
+	//Este método valida que un id se encuentre dentro de la lista de tokens.
+	public static boolean onList(int id, ArrayList<Token> tokens){
+		if (tokens!=null){
+			for(Token objeto:tokens){
+				if(id==objeto.getId()){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
 	public static String getDescOper(ArrayList<Operadores> oper, String valor) {
 
 		for (Operadores operador : oper) {
@@ -690,6 +705,15 @@ public class Valores {
 		}
 		return "vacio";
 	}
+	public static String showListaTokens(ArrayList<Token> tokens) {
+
+		for (Token token : tokens) {
+			System.out.println("Token.ValorDip: "+token.getValorDisp());
+			System.out.println("Token.valorSql: "+token.getValorSql());
+		}
+		return "vacio";
+	}
+
 
 	public static void limpiarListas(TanQuery frame) {
 		// frame.dataBases.clear();
