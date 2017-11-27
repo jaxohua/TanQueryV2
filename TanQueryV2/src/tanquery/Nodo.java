@@ -1,17 +1,17 @@
 package tanquery;
 
 public class Nodo {
-	int id;
-	Nodo padre;
-	Nodo hijoIzq;
-	Nodo hijoDer;
-	Nodo atributos;
-	String simbolo;
-	String valor;
-	Consulta derecha;
-	String valorSql;
-	String sqlStm;
-	String condicion;
+	public int id;
+	public Nodo padre;
+	public Nodo hijoIzq;
+	public Nodo hijoDer;
+	public Nodo atributos;
+	public String simbolo;
+	public String valor;
+	public Consulta derecha;
+	public String valorSql;
+	public String sqlStm;
+	public String condicion;
 
 	public Nodo(Nodo nodo) {
 		super();
@@ -151,6 +151,9 @@ class ArbolConsulta {
 	public synchronized void recorrido(TanQuery frame) {
 		ayudanteRecorrido(frame, raiz);
 	}
+	public synchronized void recorridoLog(TanQuery frame) {
+		ayudaRecorreLog(frame, raiz);
+	}
 
 	public synchronized void recorridoAlgebraRelacional(TanQuery frame) {
 		recorridoAR(frame, raiz);
@@ -171,8 +174,10 @@ class ArbolConsulta {
 			return true;
 		case "JOIN":
 			return true;
+		case "SEMI-JOIN":
+			return true;
 
-		case "X":// Producto cruzado
+		case "X":// cross product
 			return true;
 
 		case "/":
@@ -201,6 +206,48 @@ class ArbolConsulta {
 
 	}
 
+	private void ayudaRecorreLog(TanQuery frame, Nodo nodo) {
+		String ar = "";
+		String linea = "";
+		String id = Integer.toString(nodo.id);
+		String hijoDer = "-", hijoIzq = "-", padre = "-", atributo = "-";
+		boolean tieneHijoDer = false;
+		boolean tieneHijoIzq = false;
+		boolean tieneAtributos = false;
+		boolean tienePadre = false;
+
+		if (nodo == null)
+			return;
+		
+		tieneHijoDer = nodo.hijoDer != null ? true : false;
+		tieneHijoIzq = nodo.hijoIzq != null ? true : false;
+		tieneAtributos = nodo.atributos != null ? true : false;
+		tienePadre = nodo.padre != null ? true : false;
+				
+		if (tieneHijoDer) {
+			hijoDer = Integer.toString(nodo.hijoDer.id);
+		}
+		if (tieneHijoIzq) {
+			hijoIzq = Integer.toString(nodo.hijoIzq.id);
+		}
+		if (tienePadre) {
+			padre = Integer.toString(nodo.padre.id);
+		}
+		if (tieneAtributos) {
+			atributo = Integer.toString(nodo.atributos.id);
+		}
+
+		linea=id+","+hijoDer+","+hijoIzq+","+padre+","+atributo+frame.momento+"\n";
+		System.out.println("%    %"+linea);
+		
+		if (nodo.atributos != null) {
+			ayudanteRecorrido(frame, nodo.atributos);
+		}
+		
+		ayudanteRecorrido(frame, nodo.hijoIzq); // recorre subarbol izquierdo
+		ayudanteRecorrido(frame, nodo.hijoDer); // recorre subarbol derecho
+	}
+	
 	private void ayudanteRecorrido(TanQuery frame, Nodo nodo) {
 		String ar = "";
 		if (nodo == null)
@@ -266,7 +313,7 @@ class ArbolConsulta {
 
 		if (nodoEs.equals("attribute") || nodoEs.equals("comparation")
 				|| nodoEs.equals("constant")) {
-			
+
 			if (nodoEs.equals("constant")) {
 				ar=ar.concat("'");
 			}
@@ -283,7 +330,7 @@ class ArbolConsulta {
 			if (nodoEs.equals("constant")) {
 				ar=ar.concat("'");
 			}
-			
+
 			if (nodo.atributos != null) {
 				if (Valores.whatIs(nodo.atributos.id).equals("attribute")
 						&& Valores.whatIs(nodo.id).equals("attribute")) {
@@ -356,7 +403,7 @@ class ArbolConsulta {
 			}
 
 		}
-		if (nodoEs.equals("attribute") || nodoEs.equals("comparation")
+		else if (nodoEs.equals("attribute") || nodoEs.equals("comparation")
 				|| nodoEs.equals("constant")) {
 			if (nodoEs.equals("constant")) {
 				frame.querySQL = frame.querySQL.concat("'");
@@ -373,7 +420,7 @@ class ArbolConsulta {
 				frame.qTemp = frame.qTemp.concat(nodo.valor);
 				nodo.sqlStm = nodo.sqlStm.concat(nodo.valor);
 			}
-			
+
 //			frame.querySQL = frame.querySQL.concat(nodo.valor);
 //			frame.qTemp = frame.qTemp.concat(nodo.valor);
 //			nodo.sqlStm = nodo.sqlStm.concat(nodo.valor);
@@ -394,7 +441,7 @@ class ArbolConsulta {
 				// frame.querySQL=frame.querySQL.concat(" from ");
 			}
 		}
-		if (nodoEs.equals("operator")) {
+		else if (nodoEs.equals("operator")) {
 			if (isBinario(nodo.valor)) {
 				if (nodo.padre != null) {
 					frame.querySQL = frame.querySQL.concat("(");
@@ -449,6 +496,35 @@ class ArbolConsulta {
 					}
 				}
 
+				if (nodo.valor.equals("SEMI-JOIN")) {
+					// if(nodo.padre==null){
+					frame.querySQL = frame.querySQL.concat("SELECT * FROM ");
+					frame.qTemp = frame.qTemp.concat("SELECT * FROM ");
+					// }
+					generaSQL(frame, nodo.hijoIzq);
+					frame.querySQL = frame.querySQL.concat(" WHERE EXISTS (SELECT * FROM  ");
+					frame.qTemp = frame.qTemp.concat(" WHERE EXISTS (SELECT * FROM  ");
+					generaSQL(frame, nodo.hijoDer);
+
+					if (nodo.atributos != null) {
+						frame.querySQL = frame.querySQL.concat(" WHERE ");
+						// nodo.condicion=nodo.condicion.concat(nodo.atributos.sqlStm);
+						generaSQL(frame, nodo.atributos);
+					    frame.querySQL = frame.querySQL.concat(" )");
+
+					}
+
+					try {
+						nodo.sqlStm = "SELECT * FROM " + nodo.hijoIzq.sqlStm
+								+ " WHERE EXISTS ( SELECT * FROM " + nodo.hijoDer.sqlStm
+								+ "WHERE " + nodo.condicion + " )";
+
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						// e.printStackTrace();
+					}
+				}
+
 				if (nodo.padre != null) {
 					// String query="create view v"+nodo.id+" as "+frame.qTemp;
 					// frame.qTemp="";
@@ -485,22 +561,22 @@ class ArbolConsulta {
 						generaSQL(frame, nodo.atributos);
 //						frame.querySQL = frame.querySQL.concat(" where ");
 //						generaSQL(frame, nodo.atributos);
-						
-						
+
+
 						//	}
 
 					}
-						 
+
 //						if(nodo.padre==null){
 	//						frame.querySQL=frame.querySQL.concat("select * from ");
 	//					generaSQL(frame, nodo.hijoIzq);
-						
+
 		//				}
-						
-						
+
+
 					}
 
-				
+
 				if (nodo.padre != null) {
 					frame.querySQL = frame.querySQL.concat(") as o" + nodo.id);
 				}
@@ -598,7 +674,8 @@ class ArbolConsulta {
 
 	public void dibujaL(TanQuery frame, Nodo nodo) { // dibuja la linea de padre
 														// a hijo
-		float radio = 40;
+		float radio = 130;
+		
 		if (nodo == null)
 			return;
 		if (frame.interfaz == 0) {
@@ -610,25 +687,28 @@ class ArbolConsulta {
 
 		if (nodo.hijoIzq != null) {
 			// obtener posición de padre e hijo izquierdo
-			float fx = Consulta.getTokenX(frame, nodo.id);
+			float fx = Consulta.getTokenX(nodo.id,frame.width,frame.tuioObjectList);
 			float fy = Consulta.getTokenY(frame, nodo.id);
-			float sx = Consulta.getTokenX(frame, nodo.hijoIzq.id);
+			float sx = Consulta.getTokenX(nodo.hijoIzq.id,frame.width,frame.tuioObjectList);
 			float sy = Consulta.getTokenY(frame, nodo.hijoIzq.id);
 
 			if (Busquedas.isInTrabajo(fx, fy) && Busquedas.isInTrabajo(sx, sy)) {
-				frame.line(fx - 15, fy + radio, sx, sy - radio - 14);
+				frame.line(fx, fy+50, sx, sy - radio);
+				//frame.line(fx - 100, fy +120 , sx, sy - radio - 14);
 			}
 			dibujaL(frame, nodo.hijoIzq);
 
 		}
 		if (nodo.hijoDer != null) {
 			// obtener posición de padre e hijo Derecho
-			float fx = Consulta.getTokenX(frame, nodo.id);
+			float fx = Consulta.getTokenX(nodo.id,frame.width,frame.tuioObjectList);
 			float fy = Consulta.getTokenY(frame, nodo.id);
-			float sx = Consulta.getTokenX(frame, nodo.hijoDer.id);
+			float sx = Consulta.getTokenX(nodo.hijoDer.id,frame.width,frame.tuioObjectList);
 			float sy = Consulta.getTokenY(frame, nodo.hijoDer.id);
 			if (Busquedas.isInTrabajo(fx, fy) && Busquedas.isInTrabajo(sx, sy)) {
-				frame.line(fx + 15, fy + radio, sx, sy - radio - 14);
+				frame.line(fx, fy+50, sx, (sy - radio)-20);
+				//frame.line(fx - 100, fy +120 , sx, sy - radio - 14);
+
 			}
 			dibujaL(frame, nodo.hijoDer);
 		}

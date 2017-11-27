@@ -80,7 +80,7 @@ public class Busquedas {
 			}
 		}
 		else{
-			System.out.println("La lista de tokens esta vacia.");
+			//System.out.println("La lista de tokens esta vacia.");
 		}
 		return false;
 	}
@@ -107,16 +107,16 @@ public class Busquedas {
 			}
 		}
 		return false;
-		
+
 	}
-	
+
 	public static boolean isInTrabajo(float x, float y) {
 		float x1 = 520;
 		float x2 = x1+750;
 		float y1 = 5;
 		float y2 = 670;
 		if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
-			 System.out.println("El objeto esta en rango:" + x + " , " + y);
+			// System.out.println("El objeto esta en rango:" + x + " , " + y);
 			return true;
 		}
 		System.out.println("Fuera de Rango x:" + x + " y:" + y);
@@ -137,5 +137,5 @@ public class Busquedas {
 		return false;
 
 	}
-	
+
 }

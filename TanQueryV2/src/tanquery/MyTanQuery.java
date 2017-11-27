@@ -30,6 +30,8 @@ public class MyTanQuery extends javax.swing.JFrame{
 	DefaultTableModel model;
 	Integer h=0; 
 	int reset=0;
+	String anterior;
+
 //linea
 
 	public static void main(String[] args) throws SQLException {
@@ -86,7 +88,7 @@ public class MyTanQuery extends javax.swing.JFrame{
 		table = new JTable();
 		table.setBorder(null);
 		table.setForeground(Color.WHITE);
-		table.setFont(new Font("Lucida Grande", Font.PLAIN, 10));
+		table.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		table.setBounds(0, 0, 486, 302);
 		table.setOpaque(true);
 		table.setFillsViewportHeight(true);
@@ -111,13 +113,13 @@ public class MyTanQuery extends javax.swing.JFrame{
 		pSketch.setLayout(null);
 		pSketch.add(sketch);
 		sketch.setLayout(null);
-		
 		setVisible(true);
+		
 		
 	}
 
 	private void getDatos() {
-		System.out.println("Entrando a getDatos");
+		anterior="";
 		SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
 
 			@Override
@@ -130,21 +132,36 @@ public class MyTanQuery extends javax.swing.JFrame{
 			protected Void doInBackground() {
 				
 				while (true) {
-					if (sketch.actualizar==true && sketch.querySQL!="") {
-						getResult(sketch, table);
-						System.out.println("Entrando en el Hilo..."
-								+ sketch.querySQL);
-					} else {
-						if(sketch.querySQL==""){
-							table.setModel(new DefaultTableModel());
-						}
-						reset++;
-						lblNewLabel.setText("Reseteando "+reset);
+					//System.out.println("Entrando en el Hilo getDatos...");
+					//System.out.println("Entrando a getDatos actualizar:"+sketch.actualizar+" query:"+sketch.querySQL+" anterior:"+anterior);
+
+					//if (sketch.actualizar==true && sketch.querySQL.isEmpty()==false) {
+					if (sketch.actualizar==true && (sketch.querySQL.isEmpty() || !sketch.querySQL.isEmpty()) ) {
+							System.out.println("Ejecutando Consulta Mysql=> " + sketch.querySQL);
+							getResult(sketch, table);
+							anterior=sketch.querySQL;
 					}
+				
+			
+					/*} else {
+						if(sketch.querySQL.isEmpty() && sketch.actualizar==true){
+							try {
+								//Thread.sleep(1005);
+								Thread.sleep(505);
+
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+
+						}
+						
+						//reset++;
+						//lblNewLabel.setText("Reseteando "+reset);
+					}*/
 
 					try {
-						Thread.sleep(1005);
-						//Thread.sleep(505);
+						//Thread.sleep(1005);
+						Thread.sleep(505);
 
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
@@ -156,26 +173,63 @@ public class MyTanQuery extends javax.swing.JFrame{
 		worker.execute();
 	}
 
+	@SuppressWarnings("deprecation")
 	public void getResult(TanQuery sketch, JTable table){
+		ResultSet rs;
+
 		try {
-			ResultSet rs;
-			sketch.conex.setSt(sketch.conex.con.createStatement());
-			sketch.conex.setRs(sketch.conex.getSt().executeQuery(sketch.querySQL));
-			rs = sketch.conex.getRs();
-			
-			model = buildTableModel(rs);
-			table.setModel(model);
-			if(sketch.querySQL==""){
-				table.setModel(new DefaultTableModel());
+			if(sketch.actualizar==true && (anterior.compareTo(sketch.querySQL)!=0 )){//
+				sketch.conex.setSt(sketch.conex.con.createStatement());
+				sketch.conex.setRs(sketch.conex.getSt().executeQuery(sketch.querySQL));			
+				rs = sketch.conex.getRs();
+				System.out.println("Ejecutando Consulta Mysql=> " + sketch.querySQL);
+				model = buildTableModel(rs);
+				table.setModel(model);
+				anterior=sketch.querySQL;
 			}
+			
+			//else(){
+				///cleanTable(sketch, table);
+			//}
+			
+			
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
+			System.out.println("+++++++++++++++ERROR en CONSULTA+++");
+			cleanTable(sketch, table);//si da error.
+			
+		}
+
+		// JOptionPane.showMessageDialog(null, new JScrollPane(table));
+	}
+	public void cleanTable(TanQuery sketch, JTable table){
+		//String vacia="select * from usu";
+		DefaultTableModel dm = (DefaultTableModel) table.getModel();
+
+		try {
+			System.out.println("**Blanqueando la tabla**");
+
+		    for (int i = 0; i < dm.getRowCount(); i++) {
+		        for (int j = 0; j < dm.getColumnCount(); j++) {
+		            dm.setValueAt("", i, j);
+		        }
+		    }
+
+			table.setModel(dm);
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			//e.printStackTrace();
+			System.out.println("Error Blanqueando la tabla.");
 		}
 
 		// JOptionPane.showMessageDialog(null, new JScrollPane(table));
 	}
 
+
+	
 	public static DefaultTableModel buildTableModel(ResultSet rs)
 			throws SQLException {
 
@@ -201,4 +255,7 @@ public class MyTanQuery extends javax.swing.JFrame{
 		return new DefaultTableModel(data, columnNames);
 
 	}
+
+	
+
 }

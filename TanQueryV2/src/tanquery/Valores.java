@@ -51,7 +51,7 @@ public class Valores {
 		if (frame.dataBases.size() > 0)
 			return true;
 		return false;
-		
+
 	}
 
 	public static boolean fillRelations(TanQuery frame) {
@@ -60,7 +60,7 @@ public class Valores {
 		if (frame.DATABASE) {
 			//frame.conex = new DBConnect("localhost", 3306, frame.dataBase,
 				//	"tanquery", "$tanquery$");
-			
+
 			listaVal = getValores(frame.conex, "show tables from "
 					+ frame.dataBase, "Tables_in_" + frame.dataBase);
 			System.out.println("Obteniendo Tablas de " + frame.dataBase);
@@ -314,26 +314,22 @@ public class Valores {
 
 	}
 
-	public static String whatIs(int id) {// Regresa el tipo de objeto que
-
-		// corresponde a partir del id.
-		if (id == 0)
-			return "SAVE";
-
+	public static String whatIs(int id) {// return pyfo type 
 		if (id == 1)
 			return "DB";
 
-		if (id >= 6 && id <= 15)// Verdes
+		if (id >= 6 && id <= 15)// green
 			return "relation";
 
-		if (id >= 16 && id <= 25)// Azules
+		if (id >= 16 && id <= 25)// blue
 			return "attribute";
 
-		if (id >= 26 && id <= 35)// Café
+		if (id >= 26 && id <= 35)// brown
 			return "constant";
-		if (id >= 36 && id <= 45)// Amarillo
-									// (proyección,selección,crossproduct,)
+		
+		if (id >= 36 && id <= 45)// yellow (relational operators)
 			return "operator";
+		
 		if (id >= 46 && id <= 55)// (<,<=,>,>=;==;!=)
 			return "comparation";
 
@@ -346,6 +342,10 @@ public class Valores {
 		int id = objeto.getSymbolID();
 		int objetoX = objeto.getScreenX(frame.width);
 		int objetoY = objeto.getScreenY(frame.height);
+		
+		float fobjetoX = objeto.getX();
+		float fobjetoY = objeto.getY();
+		
 		ArrayList<Token> lista = frame.tokens;
 		String valor = null;
 		String tipo = null;
@@ -361,15 +361,18 @@ public class Valores {
 		}
 
 		if (valor != null) {
-			 System.out.println("Valor encontrado:" + valor + " para Objeto:"
-			  + objeto.getSymbolID());
+			// System.out.println("Valor encontrado:" + valor + " para Objeto:"
+			 // + objeto.getSymbolID());
 
 			frame.fill(255, 0, 0);
 
-			Display.showValor(frame, valor, objetoX - 40, objetoY - 40, tipo);
+			//Display.showValor(frame, valor, fobjetoX*1000, fobjetoY*1000, tipo);
+			Display.showValor(frame, valor, objetoX, objetoY, tipo);
+			//System.out.println("getX:"+fobjetoX+" getY:"+fobjetoY);
+			//System.out.println("X:"+objetoX+" Y:"+objetoY);
 			frame.ellipseMode(frame.CORNER);
 			frame.fill(frame.random(255), 20, 50, 2);// these are the colors
-			Display.dibujaElipse(frame, objetoX, objetoY, tipo);
+			//Display.dibujaElipse(frame, objetoX, objetoY, tipo);
 		}
 
 	}
@@ -452,7 +455,7 @@ public class Valores {
 				if (token.getId() == id) {
 					valor=token.getValorDisp();
 
-					 System.out.println("getValorToken: encontrado " +valor);
+					// System.out.println("getValorToken: encontrado " +valor);
 
 					if(Valores.whatIs(id).equals("attribute")){
 						//String rel = getValorToken(frame.tokens, idAttribute);
@@ -531,6 +534,14 @@ public class Valores {
 						+ "\n\n La notación de ThetaJoin es el mismo símbolo que se utiliza para NaturalJoin, la diferencia radica en que ThetaJoin lleva "
 						+ "el predicado C: \n R \u2A1DC S",
 						"\u2A1D", "binario"));
+		
+		operadores
+		.add(new Operadores(
+				"SEMI-JOIN",
+				"SEMI-JOIN: Un semi-join entre dos relaciones, devuelve las filas de la primera relación donde una o más coincidencias son encontradas en la segunda relación,"+
+				" la diferencia entre un SEMI-JOIN y un JOIN convencional, es que las filas de la primera relación solo aparecen una sola vez. Este operador es utilizado para reducir el costo de la comunicación en sistemas de bases de datos distribuidos"
+				,"\u22C9", "binario"));
+		
 		operadores
 				.add(new Operadores(
 						"UNION",
@@ -549,19 +560,17 @@ public class Valores {
 		return operadores;
 	}
 
-	public static ArrayList<Operadores> fillComparation() {// Llena el contenido
-															// de
-															// operadores
-															// lógicos
-		ArrayList<Operadores> comparation = new ArrayList<Operadores>();
-		comparation.add(new Operadores(">", "Mayor que", ">", ""));
-		comparation.add(new Operadores(">=", "Mayor o igual que", ">=", ""));
-		comparation.add(new Operadores("<", "Menor que", "<", ""));
-		comparation.add(new Operadores("<=", "Menor ó igual que", "<=", ""));
-		comparation.add(new Operadores("=", "Igual que", "=", ""));
-		comparation.add(new Operadores("!=", "Diferente ó no es igual que",
+	public static ArrayList<Operadores> fillComparison() {
+		// Defining comparison operators
+		ArrayList<Operadores> comparison = new ArrayList<Operadores>();
+		comparison.add(new Operadores(">", "Mayor que", ">", ""));
+		comparison.add(new Operadores(">=", "Mayor o igual que", ">=", ""));
+		comparison.add(new Operadores("<", "Menor que", "<", ""));
+		comparison.add(new Operadores("<=", "Menor ó igual que", "<=", ""));
+		comparison.add(new Operadores("=", "Igual que", "=", ""));
+		comparison.add(new Operadores("!=", "Diferente ó no es igual que",
 				"!=", ""));
-		return comparation;
+		return comparison;
 	}
 
 	public static void saveTokens(ArrayList<Token> tokens) {// Guardar Tokens en
@@ -641,7 +650,9 @@ public class Valores {
 				frame.fill(51, 51, 255); // Attribute
 				break;
 			case "constant":
-				frame.fill(139, 69, 19);// Constant
+				frame.fill(255,255,0);// Constant
+//				frame.fill(139, 69, 19);// Constant
+
 				break;
 
 			case "operator":
@@ -670,8 +681,8 @@ public class Valores {
 	}
 
 	public static Token getToken(int id, ArrayList<Token> tokens) {
-		System.out.println("Se quiere mostrar el Token: " + id
-				+ "Tamaño de lista:" + tokens.size());
+		//System.out.println("Se quiere mostrar el Token: " + id
+		//		+ "Tamaño de lista:" + tokens.size());
 		Token object = null;
 
 		for (Token objeto : tokens) {
@@ -695,7 +706,7 @@ public class Valores {
 		}
 		return false;
 	}
-	
+
 	public static String getDescOper(ArrayList<Operadores> oper, String valor) {
 
 		for (Operadores operador : oper) {

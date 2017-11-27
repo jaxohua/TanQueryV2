@@ -45,7 +45,7 @@ public class Consulta {
 
 	String valorSql;
 	long idSesion;
-	
+
 
 	public Consulta(int id, int posX, int posY, String tipo,String simbolo, String valorDisp,
 			String valorSql, long idSesion) {
@@ -89,7 +89,7 @@ public class Consulta {
 	}
 
 	public static boolean addConsulta(TanQuery frame, int id) {
-		int posX = getTokenX(frame, id);
+		int posX = getTokenX(id,frame.width,frame.tuioObjectList);
 		int posY = getTokenY(frame, id);
 		Token token = new Token();
 		token = Valores.getToken(id, frame.tokens);
@@ -200,10 +200,12 @@ public class Consulta {
 		return padre;
 	}
 
-	public static int getTokenX(TanQuery frame, int id) {
-		for (TuioObject objeto : frame.tuioObjectList) {
+	//	public static int getTokenX(TanQuery frame, int id) {
+
+	public static int getTokenX(int id,int width,ArrayList<TuioObject> tuioObjectList) {
+		for (TuioObject objeto : tuioObjectList) {
 			if (objeto.getSymbolID() == id) {
-				return objeto.getScreenX(frame.width);
+				return objeto.getScreenX(width);
 			}
 		}
 		return -1;
@@ -256,30 +258,36 @@ public class Consulta {
 		int yT1;
 		int yT2;
 		float distY = frame.distY;
+		String whatIsT1="";
+		String whatIsT2="";
+		int diferenciaY;
+		int diferenciaX ;
+		Consulta t1 ;
+		Consulta t2 ;
 
 		String ubicacion = "";
-		System.out.println();
-		System.out.println("ordenada:");
-		listaContenido(ordenada);
-		System.out.println();
-		System.out.println("Frame.Consulta:");
-		listaContenido(frame.consulta);
+//		System.out.println();
+//		System.out.println("ordenada:");
+//		listaContenido(ordenada);
+//		System.out.println();
+//		System.out.println("Frame.Consulta:");
+//		listaContenido(frame.consulta);
 
 		if (frame.arbolConsul.getRaiz() == null) // si el arbol esta vacio
 			frame.arbolConsul.setRaiz(newRoot);
 
 		// si el arbol contiene por lo menos un elemento
-		else if (frame.arbolConsul.getRaiz() != null) { 
+		else if (frame.arbolConsul.getRaiz() != null) {
 
 			// Si el valor de la nueva raiz es diferente al que tiene la raíz
 			// actual y es de tipo operador, se realiza el cambio de raiz
-			
+
 			  if (newRoot.valor != frame.arbolConsul.getRaiz().valor &&
 			  Valores.whatIs(newRoot.id) == "operator") {
-			 
+
 			//if (newRoot.valor != frame.arbolConsul.getRaiz().valor) {
 
-				temporal = frame.arbolConsul.getRaiz(); // copiar raiz actual a nodo temporal 
+				temporal = frame.arbolConsul.getRaiz(); // copiar raiz actual a nodo temporal
 				frame.arbolConsul.setRaiz(newRoot); // el nuevo nodo es insertado en la raíz del arbol
 
 				if (isInConsulta(ordenada, temporal.id) && temporal.id!=newRoot.id) {
@@ -354,48 +362,51 @@ public class Consulta {
 			// for (int j = i + 1; j < ordenada.size(); j++) {
 			for (int j = 0; j < ordenada.size(); j++) {
 
-				xT1 = getTokenX(frame, ordenada.get(i).getId());
+				xT1 = getTokenX(ordenada.get(i).getId(),frame.width,frame.tuioObjectList);
 				yT1 = getTokenY(frame, ordenada.get(i).getId());
-				xT2 = getTokenX(frame, ordenada.get(j).getId());
+				xT2 = getTokenX(ordenada.get(j).getId(),frame.width,frame.tuioObjectList);
 				yT2 = getTokenY(frame, ordenada.get(j).getId());
-				int diferenciaY = yT2 - yT1;
-				int diferenciaX = abs(xT2 - xT1);
-				Consulta t1 = getConsulta(ordenada, ordenada.get(i).id);
-				Consulta t2 = getConsulta(ordenada, ordenada.get(j).id);
+				diferenciaY = yT2 - yT1;
+				diferenciaX = abs(xT2 - xT1);
+				t1 = getConsulta(ordenada, ordenada.get(i).id);
+				t2 = getConsulta(ordenada, ordenada.get(j).id);
 
-				System.out.println("Valor de " + ordenada.get(i).getId()
-						+ "xT1:" + xT1 + " " + ordenada.get(j).getId() + "xT2:"
-						+ xT2 + " DiferenciaX:" + diferenciaX + "DiferenciaY:" + diferenciaY);
-				/*System.out.println("Valor de " + ordenada.get(i).getId()
+				/*System.out.println("Valor de T1-"+ordenada.get(i).getId()
+						+ "x:" + xT1 + " T2-" + ordenada.get(j).getId() 
+						+"x:"+ xT2 + " DiferenciaX:" + diferenciaX + " DiferenciaY:" + diferenciaY+" Valor de " + ordenada.get(i).getId()
 						+ "yT1:" + yT1 + " " + ordenada.get(j).getId() + "yT2:"
 						+ yT2 + " DiferenciaY:" + diferenciaY);*/
-				
-				String whatIsT1 = Valores.whatIs(ordenada.get(i).getId());
-				String whatIsT2 = Valores.whatIs(ordenada.get(j).getId());
-				
-				//Asigna hijo(T2) al nodo padre (T1)
-				if(whatIsT1.equals("operator")){
-					if (diferenciaY <= distY && diferenciaY > 50
-							&& diferenciaX > 20 && diferenciaX < 80) {//80
-						ubicacion = izqDer(xT1, xT2);// devuelve la ubicacion de t2
-														// con respecto a t1
-						temporal = construirNodo(ordenada.get(j));
-						nodoPadre = frame.arbolConsul.getNodo(ordenada.get(i)
-								.getId());
-						nodoEncontrado = frame.arbolConsul.getNodo(temporal.id);
-						if (nodoEncontrado != null) {
-							frame.arbolConsul.removeNodo(nodoEncontrado); //Si encuentra el nodo en el arbol, lo elimina
-						}
+				System.out.println(ordenada.get(i).getId()+"-"+ordenada.get(j).getId()+" DX:"+diferenciaX+ " DY:"+diferenciaY);
 
-						if(nodoPadre!=null){
-							frame.arbolConsul.insertarNodo(temporal, ubicacion,
-								nodoPadre);
+				 whatIsT1 = Valores.whatIs(ordenada.get(i).getId());
+				 whatIsT2 = Valores.whatIs(ordenada.get(j).getId());
+
+				//Asigna hijo(T2) al nodo padre (T1)
+				if(whatIsT1.equals("operator") ){
+					
+					if(whatIsT2.equals("operator") || whatIsT2.equals("relation")){
+						if (diferenciaY <= distY && diferenciaY > 50
+								&& diferenciaX > 20 && diferenciaX < 80) {//80
+							ubicacion = izqDer(xT1, xT2);// devuelve la ubicacion de t2
+															// con respecto a t1
+							temporal = construirNodo(ordenada.get(j));
+							nodoPadre = frame.arbolConsul.getNodo(ordenada.get(i)
+									.getId());
+							nodoEncontrado = frame.arbolConsul.getNodo(temporal.id);
+							if (nodoEncontrado != null) {
+								frame.arbolConsul.removeNodo(nodoEncontrado); //Si encuentra el nodo en el arbol, lo elimina
+							}
+
+							if(nodoPadre!=null){
+								frame.arbolConsul.insertarNodo(temporal, ubicacion,
+									nodoPadre);
+							}
 						}
 					}
 				}
-				
 
-				if (diferenciaY > -20 && diferenciaY < 40 && diferenciaX > 70 && diferenciaX < 100) {
+
+				 if (diferenciaY > -20 && diferenciaY < 40 && diferenciaX > 70 && diferenciaX < 100) {
 					if (whatIsT2.equals("attribute") || whatIsT2.equals("constant") || whatIsT2.equals("comparation")) {
 						if (ubicacion(frame, t1.id, t2.id).equals("derecha")) {
 							nodoEncontrado = frame.arbolConsul.getNodo(t2.id);
@@ -420,7 +431,7 @@ public class Consulta {
 		Nodo padre = frame.arbolConsul.getNodo(t1.id);
 		String nodoEs=Valores.whatIs(t1.id);
 
-		
+
 			if (nodoEs.equals("operator") || nodoEs.equals("attribute") || nodoEs.equals("constant")|| nodoEs.equals("comparation")) {
 				frame.arbolConsul.insertAttribute(padre, hijo);
 			}
@@ -438,18 +449,18 @@ public class Consulta {
 	}
 
 	public static String ubicacion(TanQuery frame, int refe, int id) {
-		int xT1 = getTokenX(frame, refe);
-		int xT2 = getTokenX(frame, id);
+		int xT1 = getTokenX(refe,frame.width,frame.tuioObjectList);
+		int xT2 = getTokenX(id,frame.width,frame.tuioObjectList);
 		return izqDer(xT1, xT2);
 	}
 
 	public static void ejecutaQuery(TanQuery frame, String querySQL) {
 		if(querySQL!=""){
-			System.out.println("Ejecutando Consulta Mysql=> " + querySQL);
+			//System.out.println("Ejecutando Consulta Mysql=> " + querySQL);
 		}
 	}
 
-	
+
 	/*
 	public static ArrayList resultSetToArrayList(ResultSet rs)
 			throws SQLException {

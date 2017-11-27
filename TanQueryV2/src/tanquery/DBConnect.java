@@ -7,10 +7,12 @@ public class DBConnect {
     Connection con;
 	private Statement st;
 	private ResultSet rs;
-	
+
 	public DBConnect(String server,String pto, String dbname, String user,String pass){
 		try {
+			//you should update it to com.mysql.jdbc.Driver as soon as possible.
 			String myDriver = "org.gjt.mm.mysql.Driver";
+
 			String servidor="jdbc:mysql://" + server + ":" + pto + "/" + dbname;
 			Class.forName(myDriver);
 			try {
@@ -23,7 +25,7 @@ public class DBConnect {
 			// TODO Auto-generated catch block
 			System.out.println("Error clase DBConect " + e);
 		}
-		
+
 	}
 
 	public Statement getSt() {
@@ -41,6 +43,6 @@ public class DBConnect {
 	public void setRs(ResultSet rs) {
 		this.rs = rs;
 	}
-	
+
 
 }

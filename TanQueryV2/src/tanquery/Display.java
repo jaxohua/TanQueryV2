@@ -119,40 +119,66 @@ public class Display {
 	}
 	
 	public static void showValor(TanQuery frame,String texto, float x, float y,String tipo){
+		
 		switch (tipo) {
+		case "DB":
+			frame.fill(255);
+			break;
 		case "relation":
 			frame.fill(0, 153, 0);
 			break;
 		case "attribute":
-			frame.fill(51, 51, 255); // Attribute
+			//frame.fill(51, 51, 255); // Attribute
+			frame.fill(255); // Attribute
 			break;
 		case "constant":
-			frame.fill(139, 69, 19);// Constant
+			//frame.fill(139, 69, 19);// Constant
+			frame.fill(255,255,0);// Constant
 			break;
 
 		case "operator":
 			frame.fill(255, 255, 0);// Operator
 			break;
 		case "comparation":
-			frame.fill(255, 0, 0);// Comparation
+			//frame.fill(255, 0, 0);// Comparation
+			frame.fill(255);// Comparation
 			break;
 
 		}
 		
+		if(x<800 && y<280) {
+			x=x-25;
+			y=y+45;
+		}
+		if(x<800 && y>280) {
+			x=x-25;
+			y=y-25;
+		}
+		if(x>800 && y<280) {
+			x=x-25;
+			y=y+70;
+		}
+		if(x>800 && y>280) {
+			x=x-45;
+			y=y-35;
+		}
+		if(x>800 && y>510) {
+			x=x-25;
+			y=y-40;
+		}
+		
 		if(tipo=="operator" || tipo=="comparation"){
-			x=x+30;
-			y=y+55;
 			frame.textSize(32);
 		}
 		else{
 			frame.textFont(frame.font, 18);
 		}
 //		frame.fill(200, 130, 50);
-		
-		//frame.fill(0);
-		
-		
+		//frame.fill(0);	
+		//frame.text(texto, x+frame.dispX, y+frame.dispY);
 		frame.text(texto, x, y);
+		
+		//frame.text("X:"+x+" Y:"+ y,x, y);
 	}
 	
 	public static void mensajeDesc(TanQuery frame,String texto, String tipo,TuioObject objeto){
@@ -211,20 +237,26 @@ public class Display {
 				frame.fill(0, 153, 0);
 				break;
 			case "attribute":
-				frame.fill(51, 51, 255); // Attribute
+				//frame.fill(51, 51, 255); // Attribute
+				frame.fill(255); // Attribute
 				break;
 			case "constant":
-				frame.fill(139, 69, 19);// Constant
+				//frame.fill(139, 69, 19);// Constant
+				frame.fill(255,255, 0);// Constant
 				break;
 
 			case "operator":
 				frame.fill(255, 255, 0);// Operator
 				break;
 			case "comparation":
-				frame.fill(255, 0, 0);// Comparation
+				frame.fill(0, 0, 0);// Comparation
+				break;
+			case "DB":
+				frame.fill(0, 0, 0);// Comparation
 				break;
 
 			}
+			
 		    frame.ellipseMode(frame.CORNER);
 		    if(!tipo.equals("relation")){}
 		    	//frame.rect(x, y, 8, 8);
@@ -271,7 +303,7 @@ public class Display {
 	}
 	
 	public static void dispSentencia(TanQuery frame, String sentencia,String tipo){
-		frame.textFont(frame.font, 12);
+		frame.textFont(frame.font, 16);
 		int x=20,y=600;
 		String cadena="";
 		switch (tipo){
@@ -293,7 +325,7 @@ public class Display {
 					
 		break;
 		case"sql":
-					frame.fill(0, 153, 0);
+					frame.fill(0, 203, 0);
 					x=20;
 					y=630;
 					//frame.text("SQL: "+sentencia, 20,630);
