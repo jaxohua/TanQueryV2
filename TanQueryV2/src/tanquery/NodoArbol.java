@@ -50,7 +50,6 @@ class Arbol {
 			raiz = new NodoArbol(valorInsertar); // crea nodo raiz
 			System.out.println("Nodo raiz=>"+raiz.id);
 		}
-
 	}
 
 	public synchronized void insertarNodo(int valorInsertar, String ubicacion) {

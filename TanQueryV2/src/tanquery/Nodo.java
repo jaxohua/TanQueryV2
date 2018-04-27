@@ -300,7 +300,6 @@ class ArbolConsulta {
 
 	public void recorridoAR(TanQuery frame, Nodo nodo) {
 		String ar = "";
-		// String paso;
 		if (nodo == null)
 			return;
 		String nodoEs = Valores.whatIs(nodo.id);

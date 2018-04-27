@@ -18,11 +18,9 @@ public class DBConnect {
 			try {
 				con= DriverManager.getConnection(servidor,user,pass);
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			System.out.println("Error clase DBConect " + e);
 		}
 

@@ -299,14 +299,9 @@ public class TanQuery extends PApplet {
 			System.out.println("---Consulta AR---");
 			arbolConsul.recorridoAlgebraRelacional(this);
 			System.out.println(queryAR);
-			// System.out.println("\u03A3");
 			System.out.println("---Consulta SQL:---");
 			arbolConsul.recorridoSQL(this);
 			actualizar = true;
-			// System.out.println(this.querySQL);
-
-			// Consulta.gestionaConsulta(this);
-			// this.actualizar=true;
 			arbolConsul.conexiones(this);
 
 		}

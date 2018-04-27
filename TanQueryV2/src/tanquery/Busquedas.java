@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import TUIO.TuioObject;
 
 public class Busquedas {
-	// Regresa el numero de intervalo en donde se encuentra el numero de grados
+	// Return Regresa el numero de intervalo en donde se encuentra el numero de grados
 	public static int getIndex(ArrayList<Intervalo> intervalos, float grados) {
 		for (Intervalo inter : intervalos) {
 			if (grados >= inter.inicio && grados <= inter.fin) {
@@ -31,7 +31,6 @@ public class Busquedas {
 		for (TuioObject objeto : objectList) {
 			if (objeto.getSymbolID() == id) {
 				return objeto;
-
 			}
 		}
 		return null;

@@ -382,19 +382,19 @@ public class Consulta {
 				 whatIsT2 = Valores.whatIs(ordenada.get(j).getId());
 
 				//Asigna hijo(T2) al nodo padre (T1)
-				if(whatIsT1.equals("operator") ){
-					
+
+				//Assign son(T2) to father node (T1)
+				if(whatIsT1.equals("operator") ){		
 					if(whatIsT2.equals("operator") || whatIsT2.equals("relation")){
 						if (diferenciaY <= distY && diferenciaY > 50
 								&& diferenciaX > 20 && diferenciaX < 80) {//80
-							ubicacion = izqDer(xT1, xT2);// devuelve la ubicacion de t2
-															// con respecto a t1
+							ubicacion = izqDer(xT1, xT2);// retrieve t2 position refer to t1
 							temporal = construirNodo(ordenada.get(j));
 							nodoPadre = frame.arbolConsul.getNodo(ordenada.get(i)
 									.getId());
 							nodoEncontrado = frame.arbolConsul.getNodo(temporal.id);
 							if (nodoEncontrado != null) {
-								frame.arbolConsul.removeNodo(nodoEncontrado); //Si encuentra el nodo en el arbol, lo elimina
+								frame.arbolConsul.removeNodo(nodoEncontrado); //if son node is already in tree then delete
 							}
 
 							if(nodoPadre!=null){
