@@ -1,0 +1,7 @@
+<Tanqery>
+<mysqlserver>localhost</mysqlserver>
+<port>3306</port>
+<user>tanquery</user>
+<password>$tanquery$</password>
+<logpath>/</logpath>
+</Tanqery>
