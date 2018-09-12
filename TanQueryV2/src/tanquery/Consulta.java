@@ -140,7 +140,7 @@ public class Consulta {
 				consulta.remove(consulta2);
 				return true;
 			}
-
+ 
 		}
 		return false;
 	}
